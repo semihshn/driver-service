@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class Driver {
 
     private Long id;
+    private Long userId;
     private String firstName;
     private String lastName;
     private LocalDate birhDate;

@@ -18,10 +18,10 @@ public class ContactInfoJpaAdapter implements ContactInfoPort {
     @Override
     public ContactInfo create(ContactInfo contactInformation, Driver driver) {
 
-        DriverEntity driverEntity= DriverEntity.from(driver);
+        DriverEntity driverEntity = DriverEntity.from(driver);
 
         return contactInformationJpaRepository.save(ContactInfoEntity
-                .from(contactInformation,driverEntity))
+                        .from(contactInformation, driverEntity))
                 .toModel();
     }
 

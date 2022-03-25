@@ -15,7 +15,7 @@ public class ContactInfoService {
 
     public Long create(ContactInfo contactInformation) {
         Driver driver = driverPort.retrieve(contactInformation.getDriverId());
-        ContactInfo temp=contactInformationPort.create(contactInformation, driver);
+        ContactInfo temp = contactInformationPort.create(contactInformation, driver);
         return temp.getId();
     }
 

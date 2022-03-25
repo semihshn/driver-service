@@ -14,7 +14,7 @@ public enum ExceptionType {
     COLLECTION_SIZE_EXCEPTION(2001, "Liste boyutları uyuşmuyor"),
     MAIL_EXISTS(2002, "Bu mail adresi kullanılmaktadır"),
 
-    CREDIT_SCORE_INSUFFICIENT(3001,"Kredi skorunuz yetersiz"),
+    CREDIT_SCORE_INSUFFICIENT(3001, "Kredi skorunuz yetersiz"),
 
     AUTHENTICATION_ERROR(4001, "Yetkiniz yok");
 

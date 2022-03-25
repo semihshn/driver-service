@@ -22,14 +22,19 @@ public class DriverController {
         return DriverCreateResponse.builder().id(createdDriverId).build();
     }
 
-    @DeleteMapping("{userId}")
+    @DeleteMapping("{driverId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long userId) {
-        driverService.delete(userId);
+    public void delete(@PathVariable Long driverId) {
+        driverService.delete(driverId);
     }
 
     @GetMapping("{driverId}")
     public DriverResponse retrieve(@PathVariable Long driverId) {
         return DriverResponse.from(driverService.retrieve(driverId));
+    }
+
+    @GetMapping("{userId}")
+    public DriverResponse retrieveByUserId(@PathVariable Long userId) {
+        return DriverResponse.from(driverService.retrieveByUserId(userId));
     }
 }

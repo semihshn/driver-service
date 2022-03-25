@@ -8,4 +8,6 @@ public interface DriverPort {
     void delete(Long id);
 
     Driver retrieve(Long id);
+
+    Driver retrieveByUserId(Long id);
 }

@@ -19,6 +19,7 @@ import java.util.List;
 @Table(name = "drivers")
 public class DriverEntity extends BaseEntity {
 
+    private Long userId;
     private String firstName;
     private String lastName;
     private LocalDate birhDate;
@@ -28,17 +29,19 @@ public class DriverEntity extends BaseEntity {
 
     public static DriverEntity from(Driver driver) {
         DriverEntity driverEntity = new DriverEntity();
-        driverEntity.id= driver.getId();
-        driverEntity.firstName= driver.getFirstName();
-        driverEntity.lastName= driver.getLastName();
-        driverEntity.birhDate= driver.getBirhDate();
-        driverEntity.status= Status.ACTIVE;
+        driverEntity.id = driver.getId();
+        driverEntity.userId=driver.getUserId();
+        driverEntity.firstName = driver.getFirstName();
+        driverEntity.lastName = driver.getLastName();
+        driverEntity.birhDate = driver.getBirhDate();
+        driverEntity.status = Status.ACTIVE;
         return driverEntity;
     }
 
     public Driver toModel() {
         return Driver.builder()
                 .id(id)
+                .userId(userId)
                 .firstName(firstName)
                 .lastName(lastName)
                 .birhDate(birhDate)

@@ -1,4 +1,5 @@
 package com.semihshn.driverservice.domain.contactInfo;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

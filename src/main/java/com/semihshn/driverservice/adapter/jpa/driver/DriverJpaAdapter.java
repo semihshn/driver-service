@@ -19,8 +19,8 @@ public class DriverJpaAdapter implements DriverPort {
     }
 
     @Override
-    public void delete(Long id) {
-        driverJpaRepository.findById(id)
+    public void delete(Long driverId) {
+        driverJpaRepository.findById(driverId)
                 .ifPresent(user -> {
                     user.setStatus(Status.DELETED);
                     driverJpaRepository.save(user);
@@ -33,8 +33,19 @@ public class DriverJpaAdapter implements DriverPort {
                 .toModel();
     }
 
+    @Override
+    public Driver retrieveByUserId(Long id) {
+        return retrieveDriverEntityByUserId(id)
+                .toModel();
+    }
+
     private DriverEntity retrieveDriverEntity(Long id) {
         return driverJpaRepository.findById(id)
+                .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND));
+    }
+
+    private DriverEntity retrieveDriverEntityByUserId(Long id) {
+        return driverJpaRepository.findByUserId(id)
                 .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND));
     }
 }

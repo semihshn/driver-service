@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class DriverResponse {
     private Long id;
+    private Long userId;
     private String firstName;
     private String lastName;
     private LocalDate birhDate;
@@ -21,6 +22,7 @@ public class DriverResponse {
     public static DriverResponse from(Driver driver) {
         return DriverResponse.builder()
                 .id(driver.getId())
+                .userId(driver.getUserId())
                 .firstName(driver.getFirstName())
                 .lastName(driver.getLastName())
                 .birhDate(driver.getBirhDate())
