@@ -33,7 +33,7 @@ public class DriverController {
         return DriverResponse.from(driverService.retrieve(driverId));
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("users/{userId}")
     public DriverResponse retrieveByUserId(@PathVariable Long userId) {
         return DriverResponse.from(driverService.retrieveByUserId(userId));
     }
