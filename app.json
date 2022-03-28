@@ -1,0 +1,8 @@
+{
+  "name": "smh-driver-microservice",
+  "buildpacks": [
+    {
+      "url": "heroku/java"
+    }
+  ]
+}
