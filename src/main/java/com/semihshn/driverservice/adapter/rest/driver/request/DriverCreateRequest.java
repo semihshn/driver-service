@@ -28,7 +28,7 @@ public class DriverCreateRequest {
                 .userId(userId)
                 .firstName(firstName)
                 .lastName(lastName)
-                .birhDate(birhDate)
+                .birthDate(birhDate)
                 .build();
     }
 }

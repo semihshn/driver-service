@@ -6,15 +6,15 @@ import com.semihshn.driverservice.adapter.jpa.common.BaseEntity;
 import com.semihshn.driverservice.domain.contactInfo.ContactInfo;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
 @Entity(name = "contact_informations")
 @Table(name = "contact_informations")
+@Where(clause = "status <> 'DELETED'")
 public class ContactInfoEntity extends BaseEntity {
 
     private String type;

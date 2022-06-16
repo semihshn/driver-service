@@ -15,5 +15,5 @@ public class Driver {
     private Long userId;
     private String firstName;
     private String lastName;
-    private LocalDate birhDate;
+    private LocalDate birthDate;
 }

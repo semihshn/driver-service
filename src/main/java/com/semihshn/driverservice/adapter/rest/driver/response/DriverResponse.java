@@ -25,7 +25,7 @@ public class DriverResponse {
                 .userId(driver.getUserId())
                 .firstName(driver.getFirstName())
                 .lastName(driver.getLastName())
-                .birhDate(driver.getBirhDate())
+                .birhDate(driver.getBirthDate())
                 .build();
     }
 }

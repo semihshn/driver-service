@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@Where(clause = "status <> 'DELETED'")
 public class BaseEntity {
 
     @Id
