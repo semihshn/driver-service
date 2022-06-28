@@ -1,24 +1,21 @@
 package com.semihshn.driverservice.adapter.api.notification;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.semihshn.driverservice.adapter.api.retrofit.RetrofitUtil;
 import com.semihshn.driverservice.domain.api.Notification;
-import com.semihshn.driverservice.domain.api.Payment;
 import com.semihshn.driverservice.domain.port.NotificationPort;
-import com.semihshn.driverservice.domain.port.PaymentPort;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificationApiAdapter implements NotificationPort {
 
-    @Autowired
-    private NotificationRequest notificationRequest;
+    private final NotificationRequest notificationRequest;
 
     @Override
-    public JsonElement saveNotification(Notification notification) {
-        return RetrofitUtil.executeInBlock(notificationRequest.saveNotification(new Gson().toJsonTree(notification)));
+    public Object saveNotification(Notification notification) {
+        return notificationRequest.saveNotification(notification);
     }
 
     @Override
@@ -27,7 +24,7 @@ public class NotificationApiAdapter implements NotificationPort {
     }
 
     @Override
-    public JsonElement getNotificationById(Long notificationId) {
+    public Object getNotificationById(Long notificationId) {
         return null;
     }
 }
