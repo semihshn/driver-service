@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Component
@@ -42,7 +42,7 @@ public class ElasticSearchService implements ElasticSearchPort {
     }
 
     @Override
-    public <S> List<S> search(String indexName, Class<S> clazz) throws IOException {
+    public <S> Optional<List<S>> search(String indexName, Class<S> searchingObject) throws IOException {
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
@@ -56,9 +56,9 @@ public class ElasticSearchService implements ElasticSearchPort {
 
         SearchResponse response = this.restHighLevelClient.search(request, RequestOptions.DEFAULT);
 
-        return Stream.of(response.getHits().getHits())
-                .map(hit -> read(hit, clazz))
-                .collect(Collectors.toList());
+        return Optional.of(Stream.of(response.getHits().getHits())
+                .map(hit -> read(hit, searchingObject))
+                .toList());
     }
 
 

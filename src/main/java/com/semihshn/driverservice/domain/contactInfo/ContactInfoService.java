@@ -1,18 +1,18 @@
 package com.semihshn.driverservice.domain.contactInfo;
 
-import com.semihshn.driverservice.domain.cqrsUtil.CommandResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semihshn.driverservice.domain.driver.Driver;
 import com.semihshn.driverservice.domain.port.ContactInfoPort;
 import com.semihshn.driverservice.domain.port.DriverPort;
 import com.semihshn.driverservice.domain.port.ElasticSearchPort;
+import com.semihshn.driverservice.domain.util.exception.ExceptionType;
+import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
+import com.semihshn.driverservice.domain.util.results.CommandResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import java.io.IOException;
@@ -58,7 +58,8 @@ public class ContactInfoService {
     }
 
     public List<ContactInfo> retrieveAll() throws IOException {
-        return elasticSearchPort.search("contact-infos",ContactInfo.class);
+            return elasticSearchPort.search("contact-infos",ContactInfo.class)
+                    .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND));
     }
 
     public ContactInfo retrieve(Long id) {

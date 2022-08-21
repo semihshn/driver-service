@@ -10,6 +10,6 @@ FROM mcr.microsoft.com/java/jre:17-zulu-alpine
 WORKDIR /app
 COPY --from=compiler /usr/src/app/target/driver-service-0.0.2-SNAPSHOT.jar .
 
-ENTRYPOINT ["java", "-jar", "driver-service-0.0.2-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "driver-service-0.0.2-SNAPSHOT.jar"]
 
 EXPOSE 3333

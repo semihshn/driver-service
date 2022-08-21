@@ -17,16 +17,11 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumer {
 
-    @Value(value = "${kafka.bootstrap.servers}")
-    private String bootstrapServers;
-
     @Value(value = "${kafka.group.id}")
     private String groupId;
 
-
     public ConsumerFactory<String, Object> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);

@@ -1,4 +1,4 @@
-package com.semihshn.driverservice.domain.exception;
+package com.semihshn.driverservice.domain.util.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

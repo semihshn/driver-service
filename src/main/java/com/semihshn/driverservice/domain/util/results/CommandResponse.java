@@ -1,4 +1,4 @@
-package com.semihshn.driverservice.domain.cqrsUtil;
+package com.semihshn.driverservice.domain.util.results;
 
 import java.util.function.Consumer;
 
