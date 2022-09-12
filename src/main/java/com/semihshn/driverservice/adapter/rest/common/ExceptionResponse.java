@@ -1,6 +1,6 @@
 package com.semihshn.driverservice.adapter.rest.common;
 
-import com.semihshn.driverservice.domain.exception.ExceptionType;
+import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

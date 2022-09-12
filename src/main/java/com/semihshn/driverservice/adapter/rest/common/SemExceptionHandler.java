@@ -1,8 +1,8 @@
 package com.semihshn.driverservice.adapter.rest.common;
 
-import com.semihshn.driverservice.domain.exception.ExceptionType;
-import com.semihshn.driverservice.domain.exception.SemAuthenticationException;
-import com.semihshn.driverservice.domain.exception.SemDataNotFoundException;
+import com.semihshn.driverservice.domain.util.exception.ExceptionType;
+import com.semihshn.driverservice.domain.util.exception.SemAuthenticationException;
+import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -1,8 +1,8 @@
 package com.semihshn.driverservice.adapter.jpa.driver;
 
 import com.semihshn.driverservice.adapter.jpa.common.Status;
-import com.semihshn.driverservice.domain.exception.ExceptionType;
-import com.semihshn.driverservice.domain.exception.SemDataNotFoundException;
+import com.semihshn.driverservice.domain.util.exception.ExceptionType;
+import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import com.semihshn.driverservice.domain.driver.Driver;
 import com.semihshn.driverservice.domain.port.DriverPort;
 import lombok.RequiredArgsConstructor;
