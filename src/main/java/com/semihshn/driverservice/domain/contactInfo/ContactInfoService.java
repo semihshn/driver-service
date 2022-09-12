@@ -17,7 +17,6 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -32,29 +31,16 @@ public class ContactInfoService {
 
     public Long create(ContactInfo contactInformation) {
 
-        final Long[] contactInfoId = new Long[1];
+        Driver driver = driverPort.retrieve(contactInformation.getDriverId());
+        ContactInfo entity = contactInformationPort.create(contactInformation, driver);
 
-        final AtomicReference<CommandResponse<Object>> response = new AtomicReference<>(CommandResponse.ok(null));
+        try {
+            kafkaTemplate.send("contact-info-events", mapper.writeValueAsString(entity));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        CompletableFuture<Void> future = CompletableFuture.supplyAsync(
-                        () -> {
-                            Driver driver = driverPort.retrieve(contactInformation.getDriverId());
-                            ContactInfo temp = contactInformationPort.create(contactInformation, driver);
-                            contactInfoId[0] =temp.getId();
-                            return temp;
-                        })
-                .thenApply(entity -> {
-                    try {
-                        return kafkaTemplate.send("contact-info-events", mapper.writeValueAsString(entity));
-                    } catch (JsonProcessingException e) {
-                        response.set(new CommandResponse<>(null, false));
-                        return response;
-                    }
-                })
-                .thenAccept(call -> response.set(responseHandler(response)));
-
-        future.join();
-        return contactInfoId[0];
+       return entity.getId();
     }
 
     public List<ContactInfo> retrieveAll() throws IOException {

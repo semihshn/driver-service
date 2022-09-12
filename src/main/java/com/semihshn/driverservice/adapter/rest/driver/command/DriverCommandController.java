@@ -5,6 +5,7 @@ import com.semihshn.driverservice.adapter.rest.driver.response.DriverCreateRespo
 import com.semihshn.driverservice.domain.driver.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,9 +17,10 @@ public class DriverCommandController {
     private final DriverService driverService;
 
     @PostMapping()
-    public DriverCreateResponse create(@RequestBody @Valid DriverCreateRequest request) {
+    public ResponseEntity<DriverCreateResponse> create(@RequestBody @Valid DriverCreateRequest request) {
         Long createdDriverId = driverService.create(request.convertToDriver());
-        return DriverCreateResponse.builder().id(createdDriverId).build();
+        DriverCreateResponse driverCreateResponse = DriverCreateResponse.builder().id(createdDriverId).build();
+        return new ResponseEntity<>(driverCreateResponse, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{driverId}")
