@@ -10,6 +10,7 @@ import com.semihshn.driverservice.domain.port.NotificationPort;
 import com.semihshn.driverservice.domain.port.PaymentPort;
 import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
+import com.semihshn.driverservice.domain.util.exception.SemKafkaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ public class DriverService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper mapper;
     private final ElasticSearchPort elasticSearchPort;
+
+    private static final String driverIndexName = "drivers";
 
     public Long create(Driver driver) {
 
@@ -56,28 +59,87 @@ public class DriverService {
         Driver entity = driverPort.create(driver);
 
         try {
-            kafkaTemplate.send("driver-events", mapper.writeValueAsString(entity));
+            kafkaTemplate.send("driver-create-event", mapper.writeValueAsString(entity));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
         }
 
         return entity.getId();
     }
 
     public List<Driver> retrieveAll() throws IOException {
-        return elasticSearchPort.search("drivers",Driver.class)
-                .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND));
+
+        List<Driver> driverList;
+
+        try {
+            driverList = elasticSearchPort.search(driverIndexName, Driver.class);
+        } catch (RuntimeException e) {
+            throw new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, e.getMessage());
+        }
+
+        checkIfEmpty(driverList);
+
+        return driverList;
     }
 
     public Driver retrieve(Long id) {
-        return driverPort.retrieve(id);
+
+        Driver driver;
+
+        try {
+            driver = elasticSearchPort.retrieveById(driverIndexName, id, Driver.class);
+        } catch (RuntimeException | IOException e) {
+            throw new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, e.getMessage());
+        }
+
+        checkIfNull(driver);
+
+        return driver;
     }
 
-    public Driver retrieveByUserId(Long id) {
-        return driverPort.retrieveByUserId(id);
+    public List<Driver> retrieveByUserId(Long id) throws IOException {
+
+        List<Driver> driverList;
+
+        try {
+            driverList = elasticSearchPort.retrieveByField(driverIndexName, "userId", id.toString(), Driver.class);
+        } catch (RuntimeException e) {
+            throw new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, e.getMessage());
+        }
+
+        checkIfEmpty(driverList);
+
+        return driverList;
+    }
+
+    public Long update(Driver driver) throws IOException {
+        retrieve(driver.getId());
+
+        Driver updatedDriver = driverPort.update(driver);
+        try {
+            kafkaTemplate.send("driver-update-event", mapper.writeValueAsString(driver));
+        } catch (JsonProcessingException e) {
+            throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
+        }
+
+        return updatedDriver.getId();
     }
 
     public void delete(Long driverId) {
+        retrieve(driverId);
         driverPort.delete(driverId);
+        kafkaTemplate.send("driver-delete-event", driverId.toString());
+    }
+
+    private void checkIfEmpty(List<Driver> driverList) {
+        if (driverList.isEmpty()) {
+            throw new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, "Herhangi bir kayıt bulunamadı.");
+        }
+    }
+
+    private void checkIfNull(Driver driver) {
+        if (driver == null) {
+            throw new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, "Herhangi bir kayıt bulunamadı.");
+        }
     }
 }

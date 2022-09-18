@@ -1,7 +1,9 @@
 package com.semihshn.driverservice.adapter.rest.driver.command;
 
 import com.semihshn.driverservice.adapter.rest.driver.request.DriverCreateRequest;
+import com.semihshn.driverservice.adapter.rest.driver.request.DriverUpdateRequest;
 import com.semihshn.driverservice.adapter.rest.driver.response.DriverCreateResponse;
+import com.semihshn.driverservice.adapter.rest.driver.response.DriverUpdateResponse;
 import com.semihshn.driverservice.domain.driver.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +24,13 @@ public class DriverCommandController {
         Long createdDriverId = driverService.create(request.convertToDriver());
         DriverCreateResponse driverCreateResponse = DriverCreateResponse.builder().id(createdDriverId).build();
         return new ResponseEntity<>(driverCreateResponse, HttpStatus.CREATED);
+    }
+
+    @PutMapping()
+    public ResponseEntity<DriverUpdateResponse> update(@RequestBody @Valid DriverUpdateRequest request) throws IOException {
+        Long updatedDriverId = driverService.update(request.convertToDriver());
+        DriverUpdateResponse driverUpdateResponse = DriverUpdateResponse.builder().id(updatedDriverId).build();
+        return new ResponseEntity<>(driverUpdateResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("{driverId}")

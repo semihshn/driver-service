@@ -6,6 +6,8 @@ import com.semihshn.driverservice.domain.driver.Driver;
 public interface ContactInfoPort {
     ContactInfo create(ContactInfo contactInformation, Driver driver);
 
+    ContactInfo update(ContactInfo contactInfo, Driver driver);
+
     void delete(Long id);
 
     ContactInfo retrieve(Long id);

@@ -16,7 +16,9 @@ public enum ExceptionType {
 
     CREDIT_SCORE_INSUFFICIENT(3001, "Kredi skorunuz yetersiz"),
 
-    AUTHENTICATION_ERROR(4001, "Yetkiniz yok");
+    AUTHENTICATION_ERROR(4001, "Yetkiniz yok"),
+
+    KAFKA_ERROR(5001, "Kafka Hatası");
 
     private final Integer code;
     private final String message;

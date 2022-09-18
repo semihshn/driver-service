@@ -30,7 +30,7 @@ public class DriverEntity extends BaseEntity {
     public static DriverEntity from(Driver driver) {
         DriverEntity driverEntity = new DriverEntity();
         driverEntity.id = driver.getId();
-        driverEntity.userId=driver.getUserId();
+        driverEntity.userId = driver.getUserId();
         driverEntity.firstName = driver.getFirstName();
         driverEntity.lastName = driver.getLastName();
         driverEntity.birthDate = driver.getBirthDate();

@@ -8,16 +8,13 @@ import com.semihshn.driverservice.domain.port.DriverPort;
 import com.semihshn.driverservice.domain.port.ElasticSearchPort;
 import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
-import com.semihshn.driverservice.domain.util.results.CommandResponse;
+import com.semihshn.driverservice.domain.util.exception.SemKafkaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -29,42 +26,83 @@ public class ContactInfoService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ElasticSearchPort elasticSearchPort;
 
+    private static final String contactInfoIndexName = "contact-infos";
+
     public Long create(ContactInfo contactInformation) {
 
         Driver driver = driverPort.retrieve(contactInformation.getDriverId());
+
         ContactInfo entity = contactInformationPort.create(contactInformation, driver);
 
         try {
-            kafkaTemplate.send("contact-info-events", mapper.writeValueAsString(entity));
+            kafkaTemplate.send("contact-info-create-event", mapper.writeValueAsString(entity));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
         }
 
-       return entity.getId();
+        return entity.getId();
     }
 
     public List<ContactInfo> retrieveAll() throws IOException {
-            return elasticSearchPort.search("contact-infos",ContactInfo.class)
-                    .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND));
+        List<ContactInfo> contactInfoList = elasticSearchPort.search(contactInfoIndexName, ContactInfo.class);
+
+        checkIfEmpty(contactInfoList);
+
+        return contactInfoList;
     }
 
     public ContactInfo retrieve(Long id) {
-        return contactInformationPort.retrieve(id);
+
+        ContactInfo contactInfo = null;
+
+        try {
+            contactInfo = elasticSearchPort.retrieveById(contactInfoIndexName, id, ContactInfo.class);
+        } catch (IOException e) {
+            throw new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND, e.getMessage());
+        }
+
+        checkIfNull(contactInfo);
+
+        return contactInfo;
     }
 
     public void delete(Long id) {
+        retrieve(id);
         contactInformationPort.delete(id);
+        kafkaTemplate.send("contact-info-delete-event", id.toString());
     }
 
+    public Long update(ContactInfo contactInfo) throws IOException {
+        retrieve(contactInfo.getId());
 
-    private CommandResponse<Object> responseHandler(AtomicReference<CommandResponse<Object>> o) {
-        if (o.get().getResponse() != null) {
-            @SuppressWarnings("unchecked")
-            ListenableFuture<SendResult<?,?>> result = (ListenableFuture<SendResult<?,?>>) o.get().getResponse();
-            o.set(CommandResponse.ok(result));
-            return o.get();
+        Driver driver = driverPort.retrieve(contactInfo.getDriverId());
+        ContactInfo updatedContactInfo = contactInformationPort.update(contactInfo, driver);
+        try {
+            kafkaTemplate.send("contact-info-update-event", mapper.writeValueAsString(contactInfo));
+        } catch (JsonProcessingException e) {
+            throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
         }
-        o.set(CommandResponse.error(null));
-        return o.get();
+
+        return updatedContactInfo.getId();
+    }
+
+    public List<ContactInfo> retrieveByDriverId(Long driverId) throws IOException {
+        List<ContactInfo> contactInfoList = elasticSearchPort.retrieveByField(contactInfoIndexName, "driverId", driverId.toString(), ContactInfo.class);
+
+        checkIfEmpty(contactInfoList);
+
+        return contactInfoList;
+    }
+
+    private void checkIfEmpty(List<ContactInfo> contactInfoList) {
+        if (contactInfoList.isEmpty()) {
+            throw new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND, "İletişim bilgisi bulunamadı.");
+        }
+    }
+
+    private void checkIfNull(ContactInfo contactInfo) {
+        if (contactInfo == null) {
+            throw new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND, "İletişim bilgisi bulunamadı.");
+        }
     }
 }

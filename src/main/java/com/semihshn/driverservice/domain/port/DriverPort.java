@@ -5,9 +5,11 @@ import com.semihshn.driverservice.domain.driver.Driver;
 public interface DriverPort {
     Driver create(Driver driver);
 
-    void delete(Long id);
-
     Driver retrieve(Long id);
 
     Driver retrieveByUserId(Long id);
+
+    Driver update(Driver driver);
+
+    void delete(Long id);
 }

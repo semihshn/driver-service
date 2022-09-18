@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class DriverQueryController {
     private final DriverService driverService;
 
     @GetMapping("{driverId}")
-    public DriverResponse retrieve(@PathVariable Long driverId) {
+    public DriverResponse retrieve(@PathVariable Long driverId) throws IOException {
         return DriverResponse.from(driverService.retrieve(driverId));
     }
 
@@ -27,12 +26,15 @@ public class DriverQueryController {
     public List<DriverResponse> retrieveAll() throws IOException {
         return driverService.retrieveAll()
                 .stream()
-                .map(driver -> DriverResponse.from(driver))
-                .collect(Collectors.toList());
+                .map(DriverResponse::from)
+                .toList();
     }
 
     @GetMapping("users/{userId}")
-    public DriverResponse retrieveByUserId(@PathVariable Long userId) {
-        return DriverResponse.from(driverService.retrieveByUserId(userId));
+    public List<DriverResponse> retrieveByUserId(@PathVariable Long userId) throws IOException {
+        return driverService.retrieveByUserId(userId)
+                .stream()
+                .map(DriverResponse::from)
+                .toList();
     }
 }

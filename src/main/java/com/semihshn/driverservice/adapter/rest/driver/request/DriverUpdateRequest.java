@@ -10,7 +10,10 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class DriverCreateRequest {
+public class DriverUpdateRequest {
+
+    @NotNull
+    private Long id;
 
     @NotNull
     private Long userId;
@@ -21,14 +24,15 @@ public class DriverCreateRequest {
     @NotBlank
     private String lastName;
 
-    private LocalDate birthDate;
+    private LocalDate birhDate;
 
     public Driver convertToDriver() {
         return Driver.builder()
+                .id(id)
                 .userId(userId)
                 .firstName(firstName)
                 .lastName(lastName)
-                .birthDate(birthDate)
+                .birthDate(birhDate)
                 .build();
     }
 }

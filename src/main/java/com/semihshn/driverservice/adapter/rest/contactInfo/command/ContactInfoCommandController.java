@@ -1,7 +1,9 @@
 package com.semihshn.driverservice.adapter.rest.contactInfo.command;
 
 import com.semihshn.driverservice.adapter.rest.contactInfo.request.ContactInfoCreateRequest;
+import com.semihshn.driverservice.adapter.rest.contactInfo.request.ContactInfoUpdateRequest;
 import com.semihshn.driverservice.adapter.rest.contactInfo.response.ContactInfoCreateResponse;
+import com.semihshn.driverservice.adapter.rest.contactInfo.response.ContactInfoUpdateResponse;
 import com.semihshn.driverservice.domain.contactInfo.ContactInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +25,13 @@ public class ContactInfoCommandController {
         Long createdContactId = contactInformationService.create(request.convertToContactInformation());
         ContactInfoCreateResponse contactInfoCreateResponse = ContactInfoCreateResponse.builder().id(createdContactId).build();
         return new ResponseEntity<>(contactInfoCreateResponse, HttpStatus.CREATED);
+    }
+
+    @PutMapping()
+    public ResponseEntity<ContactInfoUpdateResponse> update(@RequestBody @Valid ContactInfoUpdateRequest request) throws IOException {
+        Long updatedContactInfoId = contactInformationService.update(request.convertToContactInformation());
+        ContactInfoUpdateResponse contactInfoUpdateResponse = ContactInfoUpdateResponse.builder().id(updatedContactInfoId).build();
+        return new ResponseEntity<>(contactInfoUpdateResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("{userId}")

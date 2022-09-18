@@ -8,6 +8,8 @@ import com.semihshn.driverservice.domain.port.DriverPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class DriverJpaAdapter implements DriverPort {
@@ -16,15 +18,6 @@ public class DriverJpaAdapter implements DriverPort {
     @Override
     public Driver create(Driver driver) {
         return driverJpaRepository.save(DriverEntity.from(driver)).toModel();
-    }
-
-    @Override
-    public void delete(Long driverId) {
-        driverJpaRepository.findById(driverId)
-                .ifPresent(user -> {
-                    user.setStatus(Status.DELETED);
-                    driverJpaRepository.save(user);
-                });
     }
 
     @Override
@@ -41,11 +34,27 @@ public class DriverJpaAdapter implements DriverPort {
 
     private DriverEntity retrieveDriverEntity(Long id) {
         return driverJpaRepository.findById(id)
-                .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND));
+                .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, "Böyle bir sürücü kayıtlarımızda bulunamadı."));
     }
 
     private DriverEntity retrieveDriverEntityByUserId(Long id) {
         return driverJpaRepository.findByUserId(id)
                 .orElseThrow(() -> new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND));
+    }
+
+    @Override
+    public Driver update(Driver driver) {
+        DriverEntity updateEntity = DriverEntity.from(driver);
+        updateEntity.setCreatedDate(LocalDateTime.now());
+        return driverJpaRepository.save(updateEntity).toModel();
+    }
+
+    @Override
+    public void delete(Long driverId) {
+        driverJpaRepository.findById(driverId)
+                .ifPresent(user -> {
+                    user.setStatus(Status.DELETED);
+                    driverJpaRepository.save(user);
+                });
     }
 }

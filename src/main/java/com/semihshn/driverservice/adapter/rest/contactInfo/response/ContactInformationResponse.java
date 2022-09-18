@@ -12,12 +12,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ContactInformationResponse {
     private Long id;
+    private Long driverId;
     private String type;
     private String address;
 
     public static ContactInformationResponse from(ContactInfo contact) {
         return ContactInformationResponse.builder()
                 .id(contact.getId())
+                .driverId(contact.getDriverId())
                 .type(contact.getType())
                 .address(contact.getAddress())
                 .build();

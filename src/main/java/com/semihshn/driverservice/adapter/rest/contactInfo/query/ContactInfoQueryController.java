@@ -1,6 +1,5 @@
 package com.semihshn.driverservice.adapter.rest.contactInfo.query;
 
-import com.semihshn.driverservice.adapter.elastic.ElasticSearchService;
 import com.semihshn.driverservice.adapter.rest.contactInfo.response.ContactInformationResponse;
 import com.semihshn.driverservice.domain.contactInfo.ContactInfoService;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +30,13 @@ public class ContactInfoQueryController {
                 .stream()
                 .map(contactInfo -> ContactInformationResponse.from(contactInfo))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("drivers/{driverId}")
+    public List<ContactInformationResponse> retrieveByDriverId(@PathVariable Long driverId) throws IOException {
+        return contactInformationService.retrieveByDriverId(driverId)
+                .stream()
+                .map(ContactInformationResponse::from)
+                .toList();
     }
 }

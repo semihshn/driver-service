@@ -3,12 +3,14 @@ package com.semihshn.driverservice.adapter.jpa.contactInfo;
 import com.semihshn.driverservice.adapter.jpa.common.Status;
 import com.semihshn.driverservice.adapter.jpa.driver.DriverEntity;
 import com.semihshn.driverservice.domain.contactInfo.ContactInfo;
-import com.semihshn.driverservice.domain.util.exception.ExceptionType;
-import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import com.semihshn.driverservice.domain.driver.Driver;
 import com.semihshn.driverservice.domain.port.ContactInfoPort;
+import com.semihshn.driverservice.domain.util.exception.ExceptionType;
+import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,16 @@ public class ContactInfoJpaAdapter implements ContactInfoPort {
         return contactInformationJpaRepository.save(ContactInfoEntity
                         .from(contactInformation, driverEntity))
                 .toModel();
+    }
+
+    @Override
+    public ContactInfo update(ContactInfo contactInfo, Driver driver) {
+
+        DriverEntity driverEntity = DriverEntity.from(driver);
+
+        ContactInfoEntity updateEntity = ContactInfoEntity.from(contactInfo, driverEntity);
+        updateEntity.setCreatedDate(LocalDateTime.now());
+        return contactInformationJpaRepository.save(updateEntity).toModel();
     }
 
     @Override

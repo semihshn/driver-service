@@ -25,6 +25,7 @@ public class ContactInfoEntity extends BaseEntity {
 
     public static ContactInfoEntity from(ContactInfo contactInformation, DriverEntity driver) {
         ContactInfoEntity contactInformationEntity = new ContactInfoEntity();
+        contactInformationEntity.setId(contactInformation.getId());
         contactInformationEntity.type = contactInformation.getType();
         contactInformationEntity.address = contactInformation.getAddress();
         contactInformationEntity.driver = driver;
@@ -36,6 +37,7 @@ public class ContactInfoEntity extends BaseEntity {
         return ContactInfo.builder()
                 .id(id)
                 .type(type)
+                .driverId(driver.getId())
                 .address(address)
                 .build();
     }
