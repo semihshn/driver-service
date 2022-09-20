@@ -98,7 +98,7 @@ public class ElasticSearchService implements ElasticSearchPort {
     public void delete(String indexName, String id) {
 
         DeleteRequest deleteRequest = new DeleteRequest(indexName);
-        deleteRequest.id(id.toString());
+        deleteRequest.id(id);
         try {
             restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
