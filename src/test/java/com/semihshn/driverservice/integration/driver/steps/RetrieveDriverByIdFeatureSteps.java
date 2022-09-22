@@ -9,20 +9,17 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.RequiredArgsConstructor;
+import org.junit.ClassRule;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.containers.startupcheck.MinimumDurationRunningStartupCheckStrategy;
-import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
+import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +27,16 @@ import static org.junit.Assert.assertEquals;
 @Testcontainers
 @RequiredArgsConstructor
 public class RetrieveDriverByIdFeatureSteps extends DriverIntegrationTest {
+
+    @ClassRule
+    public static DockerComposeContainer environment =
+            new DockerComposeContainer(new File("src/test/resources/test-compose.yml"))
+                    .withExposedService("notification-service", 8888)
+                    .withExposedService("payment-service", 7777)
+                    .withExposedService("broker", 9092)
+                    .withExposedService("elasticsearch", 9200)
+                    .withExposedService("elasticsearch", 9300);
+
 
     @LocalServerPort
     private int port;
@@ -39,44 +46,6 @@ public class RetrieveDriverByIdFeatureSteps extends DriverIntegrationTest {
 
     private Long driverId;
     private ResponseEntity<DriverResponse> driverResponseResponseEntity = null;
-
-
-    Network network = Network.newNetwork();
-
-    @Container
-    public GenericContainer elasticContainer = new GenericContainer(DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch:7.8.0"))
-            .withExposedPorts(9200, 9300)
-            .withEnv("discovery.type", "single-node")
-            .withEnv("max_open_files", "65536")
-            .withEnv("max_content_length_in_bytes", "100000000")
-            .withEnv("transport.host", "elasticsearch")
-            .withNetwork(network)
-            .withStartupCheckStrategy(
-                    new MinimumDurationRunningStartupCheckStrategy(Duration.ofSeconds(1))
-            );
-
-    @Container
-    public GenericContainer zookeperContainer = new GenericContainer(DockerImageName.parse("confluentinc/cp-zookeeper:7.0.1"))
-            .withExposedPorts(2181, 2888, 3888)
-            .withEnv("ZOOKEEPER_CLIENT_PORT", "2181")
-            .withEnv("ZOOKEEPER_TICK_TIME", "2000")
-            .withNetwork(network);
-
-    @Container
-    public GenericContainer kafkaContainer = new GenericContainer(DockerImageName.parse("confluentinc/cp-kafka:7.0.1"))
-            .withExposedPorts(9092)
-            .dependsOn(zookeperContainer)
-            .withEnv("KAFKA_BROKER_ID", "1")
-            .withEnv("KAFKA_ZOOKEEPER_CONNECT", "zookeeper:2181")
-            .withEnv("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT")
-            .withEnv("KAFKA_ADVERTISED_LISTENERS", "PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092")
-            .withEnv("KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR", "1")
-            .withEnv("KAFKA_TRANSACTION_STATE_LOG_MIN_ISR", "1")
-            .withEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1")
-            .withEnv("GROUP_ID", "driver-group-id")
-            .withEnv("KAFKA_CREATE_TOPICS", "contact-info-events")
-            .withNetwork(network);
-
 
     @Given("^db contains an driver with valid id$")
     public void create_driver_with() throws IOException {
@@ -107,7 +76,7 @@ public class RetrieveDriverByIdFeatureSteps extends DriverIntegrationTest {
                 DriverResponse.class);
     }
 
-    @Then("^client receives status code (\\d+)")
+    @Then("^client receives status code (\\d+)$")
     public void check_status_code(int statusCode) {
         assertEquals(statusCode, driverResponseResponseEntity.getStatusCodeValue());
     }
