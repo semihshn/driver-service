@@ -32,7 +32,7 @@ public class DriverService {
 
     private static final String driverIndexName = "drivers";
 
-    public Long create(Driver driver) {
+    public Driver create(Driver driver) {
 
         paymentPort.savePayment(
                 Payment.builder()
@@ -64,7 +64,7 @@ public class DriverService {
             throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
         }
 
-        return entity.getId();
+        return entity;
     }
 
     public List<Driver> retrieveAll() throws IOException {
@@ -112,7 +112,7 @@ public class DriverService {
         return driverList;
     }
 
-    public Long update(Driver driver) throws IOException {
+    public Driver update(Driver driver) throws IOException {
         retrieve(driver.getId());
 
         Driver updatedDriver = driverPort.update(driver);
@@ -122,7 +122,7 @@ public class DriverService {
             throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
         }
 
-        return updatedDriver.getId();
+        return updatedDriver;
     }
 
     public void delete(Long driverId) {

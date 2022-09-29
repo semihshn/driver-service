@@ -4,6 +4,7 @@ import com.semihshn.driverservice.adapter.rest.driver.request.DriverCreateReques
 import com.semihshn.driverservice.adapter.rest.driver.request.DriverUpdateRequest;
 import com.semihshn.driverservice.adapter.rest.driver.response.DriverCreateResponse;
 import com.semihshn.driverservice.adapter.rest.driver.response.DriverUpdateResponse;
+import com.semihshn.driverservice.domain.driver.Driver;
 import com.semihshn.driverservice.domain.driver.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,15 +22,19 @@ public class DriverCommandController {
 
     @PostMapping()
     public ResponseEntity<DriverCreateResponse> create(@RequestBody @Valid DriverCreateRequest request) {
-        Long createdDriverId = driverService.create(request.convertToDriver());
-        DriverCreateResponse driverCreateResponse = DriverCreateResponse.builder().id(createdDriverId).build();
+        Driver createdDriver = driverService.create(request.convertToDriver());
+
+        DriverCreateResponse driverCreateResponse = DriverCreateResponse.from(createdDriver);
+
         return new ResponseEntity<>(driverCreateResponse, HttpStatus.CREATED);
     }
 
     @PutMapping()
     public ResponseEntity<DriverUpdateResponse> update(@RequestBody @Valid DriverUpdateRequest request) throws IOException {
-        Long updatedDriverId = driverService.update(request.convertToDriver());
-        DriverUpdateResponse driverUpdateResponse = DriverUpdateResponse.builder().id(updatedDriverId).build();
+        Driver updatedDriver = driverService.update(request.convertToDriver());
+
+        DriverUpdateResponse driverUpdateResponse = DriverUpdateResponse.from(updatedDriver);
+
         return new ResponseEntity<>(driverUpdateResponse, HttpStatus.OK);
     }
 
