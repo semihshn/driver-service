@@ -16,5 +16,4 @@ public class KafkaBean {
         return new KafkaAdmin(map);
     }
 
-
 }
