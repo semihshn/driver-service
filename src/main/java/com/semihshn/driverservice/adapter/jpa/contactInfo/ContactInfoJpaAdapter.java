@@ -4,7 +4,7 @@ import com.semihshn.driverservice.adapter.jpa.common.Status;
 import com.semihshn.driverservice.adapter.jpa.driver.DriverEntity;
 import com.semihshn.driverservice.domain.contactInfo.ContactInfo;
 import com.semihshn.driverservice.domain.driver.Driver;
-import com.semihshn.driverservice.domain.port.ContactInfoPort;
+import com.semihshn.driverservice.domain.port.ContactInfoPersistencePort;
 import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class ContactInfoJpaAdapter implements ContactInfoPort {
+public class ContactInfoJpaAdapter implements ContactInfoPersistencePort {
     private final ContactInfoJpaRepository contactInformationJpaRepository;
 
     @Override

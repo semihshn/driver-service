@@ -4,7 +4,7 @@ import com.semihshn.driverservice.adapter.jpa.common.Status;
 import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import com.semihshn.driverservice.domain.driver.Driver;
-import com.semihshn.driverservice.domain.port.DriverPort;
+import com.semihshn.driverservice.domain.port.DriverPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class DriverJpaAdapter implements DriverPort {
+public class DriverJpaAdapter implements DriverPersistencePort {
     private final DriverJpaRepository driverJpaRepository;
 
     @Override

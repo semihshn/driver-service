@@ -1,13 +1,13 @@
 package com.semihshn.driverservice.adapter.api.payment;
 
 import com.semihshn.driverservice.domain.api.Payment;
-import com.semihshn.driverservice.domain.port.PaymentPort;
+import com.semihshn.driverservice.domain.port.PaymentRestPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentApiAdapter implements PaymentPort {
+public class PaymentApiAdapter implements PaymentRestPort {
 
     private final PaymentRequest paymentServiceRequest;
 
