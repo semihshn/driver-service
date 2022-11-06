@@ -15,7 +15,7 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-public class KafkaConsumer {
+public class KafkaConsumerConfiguration {
 
     @Value(value = "${kafka.group.id}")
     private String groupId;

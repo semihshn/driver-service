@@ -12,6 +12,7 @@ import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import com.semihshn.driverservice.domain.util.exception.SemKafkaException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DriverService {
