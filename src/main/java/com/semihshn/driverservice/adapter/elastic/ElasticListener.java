@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ElasticListener {
 
-    public final ElasticSearchService elasticsearchService;
+    public final ElasticSearchAdapter elasticsearchService;
     public final ObjectMapper objectMapper;
 
     private static byte RETRY_COUNT = 0;

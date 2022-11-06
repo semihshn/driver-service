@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
-public class ElasticSearchService implements ElasticSearchPort {
+public class ElasticSearchAdapter implements ElasticSearchPort {
 
     private final RestHighLevelClient restHighLevelClient;
     private final ObjectMapper mapper;

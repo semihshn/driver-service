@@ -2,7 +2,7 @@ package com.semihshn.driverservice.domain.port;
 
 import com.semihshn.driverservice.domain.driver.Driver;
 
-public interface DriverPort {
+public interface DriverPersistencePort {
     Driver create(Driver driver);
 
     Driver retrieve(Long id);

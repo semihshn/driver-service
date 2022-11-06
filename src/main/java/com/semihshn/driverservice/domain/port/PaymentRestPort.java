@@ -2,7 +2,7 @@ package com.semihshn.driverservice.domain.port;
 
 import com.semihshn.driverservice.domain.api.Payment;
 
-public interface PaymentPort {
+public interface PaymentRestPort {
 
     Object savePayment(Payment payment);
 

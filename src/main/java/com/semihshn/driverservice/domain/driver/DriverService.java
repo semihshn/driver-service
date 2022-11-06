@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semihshn.driverservice.domain.api.Notification;
 import com.semihshn.driverservice.domain.api.Payment;
-import com.semihshn.driverservice.domain.port.DriverPort;
-import com.semihshn.driverservice.domain.port.ElasticSearchPort;
-import com.semihshn.driverservice.domain.port.NotificationPort;
-import com.semihshn.driverservice.domain.port.PaymentPort;
+import com.semihshn.driverservice.domain.port.*;
 import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import com.semihshn.driverservice.domain.util.exception.SemKafkaException;
@@ -19,18 +16,20 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DriverService {
 
-    private final DriverPort driverPort;
-    private final PaymentPort paymentPort;
-    private final NotificationPort notificationPort;
+    private final DriverPersistencePort driverPort;
+    private final PaymentRestPort paymentPort;
+    private final NotificationRestPort notificationPort;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper mapper;
     private final ElasticSearchPort elasticSearchPort;
+    private final DriverCachePort driverCachePort;
 
     private static final String driverIndexName = "drivers";
 
@@ -86,17 +85,27 @@ public class DriverService {
 
     public Driver retrieve(Long id) {
 
-        Driver driver;
+        Optional<Driver> cacheDriver = driverCachePort.retrieveDriver(id);
+        log.info("Driver is retrieving: {}", id);
 
-        try {
-            driver = elasticSearchPort.retrieveById(driverIndexName, id, Driver.class);
-        } catch (RuntimeException | IOException e) {
-            throw new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, e.getMessage());
+        if (cacheDriver.isEmpty()) {
+            log.info("Driver cache is updating: {}", id);
+            Driver driver;
+
+            try {
+                driver = elasticSearchPort.retrieveById(driverIndexName, id, Driver.class);
+                driverCachePort.createDriver(driver);
+            } catch (RuntimeException | IOException e) {
+                throw new SemDataNotFoundException(ExceptionType.DRIVER_DATA_NOT_FOUND, e.getMessage());
+            }
+
+            checkIfNull(driver);
+
+            return driver;
         }
 
-        checkIfNull(driver);
+        return cacheDriver.get();
 
-        return driver;
     }
 
     public List<Driver> retrieveByUserId(Long id) throws IOException {

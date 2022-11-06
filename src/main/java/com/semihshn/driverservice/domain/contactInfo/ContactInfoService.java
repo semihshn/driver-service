@@ -3,28 +3,33 @@ package com.semihshn.driverservice.domain.contactInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semihshn.driverservice.domain.driver.Driver;
-import com.semihshn.driverservice.domain.port.ContactInfoPort;
-import com.semihshn.driverservice.domain.port.DriverPort;
+import com.semihshn.driverservice.domain.port.ContactInfoCachePort;
+import com.semihshn.driverservice.domain.port.ContactInfoPersistencePort;
+import com.semihshn.driverservice.domain.port.DriverPersistencePort;
 import com.semihshn.driverservice.domain.port.ElasticSearchPort;
 import com.semihshn.driverservice.domain.util.exception.ExceptionType;
 import com.semihshn.driverservice.domain.util.exception.SemDataNotFoundException;
 import com.semihshn.driverservice.domain.util.exception.SemKafkaException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ContactInfoService {
 
-    private final ContactInfoPort contactInformationPort;
-    private final DriverPort driverPort;
+    private final ContactInfoPersistencePort contactInformationPort;
+    private final DriverPersistencePort driverPort;
     private final ObjectMapper mapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ElasticSearchPort elasticSearchPort;
+    private final ContactInfoCachePort contactInfoCachePort;
 
     private static final String contactInfoIndexName = "contact-infos";
 
@@ -53,17 +58,26 @@ public class ContactInfoService {
 
     public ContactInfo retrieve(Long id) {
 
-        ContactInfo contactInfo = null;
+        Optional<ContactInfo> cacheContactInfo = contactInfoCachePort.retrieveContactInfo(id);
+        log.info("Contact Info is retrieving: {}", id);
 
-        try {
-            contactInfo = elasticSearchPort.retrieveById(contactInfoIndexName, id, ContactInfo.class);
-        } catch (IOException e) {
-            throw new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND, e.getMessage());
+        if (cacheContactInfo.isEmpty()){
+            log.info("Contact Info cache is updating: {}", id);
+            ContactInfo retrievedContactInfo = null;
+
+            try {
+                retrievedContactInfo = elasticSearchPort.retrieveById(contactInfoIndexName, id, ContactInfo.class);
+                contactInfoCachePort.createContactInfo(retrievedContactInfo);
+            } catch (IOException e) {
+                throw new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND, e.getMessage());
+            }
+
+            checkIfNull(retrievedContactInfo);
+
+            return retrievedContactInfo;
         }
 
-        checkIfNull(contactInfo);
-
-        return contactInfo;
+        return cacheContactInfo.get();
     }
 
     public void delete(Long id) {
