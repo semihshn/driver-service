@@ -2,7 +2,7 @@ package com.semihshn.driverservice.adapter.redis;
 
 import com.semihshn.driverservice.adapter.redis.contactInfo.ContactInfoCache;
 import com.semihshn.driverservice.adapter.redis.driver.DriverCache;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+@Slf4j
 @Configuration
 public class RedisConfig {
 
@@ -23,6 +24,10 @@ public class RedisConfig {
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+
+        log.warn("redis host: "+redisProperties.getHost());
+        log.warn("redis port: "+redisProperties.getPort());
+
         redisStandaloneConfiguration.setHostName(redisProperties.getHost());
         redisStandaloneConfiguration.setPort(redisProperties.getPort());
 

@@ -1,3 +1,3 @@
 # Diagram
 
-<img src="microservices_diagram.png">
+<img src="img.jpg">

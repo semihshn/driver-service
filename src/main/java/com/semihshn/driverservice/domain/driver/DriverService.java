@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,6 @@ import java.util.Optional;
 public class DriverService {
 
     private final DriverPersistencePort driverPort;
-    private final PaymentRestPort paymentPort;
     private final NotificationRestPort notificationPort;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper mapper;
@@ -35,23 +35,27 @@ public class DriverService {
 
     public Driver create(Driver driver) {
 
-        paymentPort.savePayment(
-                Payment.builder()
-                        .userId(1L)
-                        .cvv("225")
-                        .expireDate("2020-08-22")
-                        .cardType(Payment.CardType.CREDIT)
-                        .ccNo("1123456894067408")
-                        .amount(new BigInteger("12423"))
-                        .build()
-        );
+        try {
+            Payment paymentEvent = Payment.builder()
+                    .userId(1L)
+                    .cvv("225")
+                    .expireDate("2020-08-22")
+                    .cardType(Payment.CardType.CREDIT)
+                    .ccNo("1123456894067408")
+                    .amount(new BigInteger("12423"))
+                    .build();
+
+            kafkaTemplate.send("payment-create-event", mapper.writeValueAsString(paymentEvent));
+        } catch (JsonProcessingException e) {
+            throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
+        }
 
         notificationPort.saveNotification(
                 Notification.builder()
                         .driverId(1L)
                         .firstName("Schumeer")
                         .lastName("Fernandes")
-                        //.birthDate(LocalDate.now())
+                        .birthDate(LocalDate.now())
                         .telephoneAddress("542 234 23 53")
                         .message("Sürücü bilgileri kaydedildi, teşekkür ederiz")
                         .build()
