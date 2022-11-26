@@ -2,7 +2,6 @@ package com.semihshn.driverservice.adapter.kafka;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -15,14 +14,17 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfiguration {
 
-    @Value(value = "${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    private final KafkaProperties kafkaProperties;
+
+    public KafkaProducerConfiguration(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
+    }
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> configs = new HashMap<>();
 
-        configs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         return new DefaultKafkaProducerFactory<>(configs);
