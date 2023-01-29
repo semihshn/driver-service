@@ -16,6 +16,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,7 @@ public class ContactInfoService {
     private final ContactInfoCachePort contactInfoCachePort;
 
     private static final String contactInfoIndexName = "contact-infos";
+    private static final String driverIndexName = "drivers";
 
     public Long create(ContactInfo contactInformation) {
 
@@ -61,7 +63,7 @@ public class ContactInfoService {
         Optional<ContactInfo> cacheContactInfo = contactInfoCachePort.retrieveContactInfo(id);
         log.info("Contact Info is retrieving: {}", id);
 
-        if (cacheContactInfo.isEmpty()){
+        if (cacheContactInfo.isEmpty()) {
             log.info("Contact Info cache is updating: {}", id);
             ContactInfo retrievedContactInfo = null;
 
@@ -106,6 +108,33 @@ public class ContactInfoService {
         checkIfEmpty(contactInfoList);
 
         return contactInfoList;
+    }
+
+    public List<ContactInfo> retrieveByUserId(Long userId) {
+
+        List<ContactInfo> contactInfoList = new ArrayList<>();
+
+        try {
+            List<Driver> driverList = elasticSearchPort.retrieveByField(driverIndexName,
+                    "userId",
+                    userId.toString(),
+                    Driver.class);
+
+            for (Driver driver : driverList) {
+
+                contactInfoList = elasticSearchPort.retrieveByField(contactInfoIndexName,
+                        "driverId",
+                        driver.getId().toString(),
+                        ContactInfo.class);
+
+            }
+
+        } catch (IOException e) {
+            throw new SemDataNotFoundException(ExceptionType.CONTACT_INFO_DATA_NOT_FOUND, "İlgili user'ın iletişim bilgileri bulunamadı.");
+        }
+
+        return contactInfoList;
+
     }
 
     private void checkIfEmpty(List<ContactInfo> contactInfoList) {

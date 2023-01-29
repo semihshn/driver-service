@@ -111,7 +111,7 @@ public class ElasticSearchAdapter implements ElasticSearchPort {
 
         GetRequest getRequest = new GetRequest(indexName, id.toString());
 
-        GetResponse getResponse = null;
+        GetResponse getResponse;
 
         try {
             getResponse = restHighLevelClient.get(getRequest, RequestOptions.DEFAULT);

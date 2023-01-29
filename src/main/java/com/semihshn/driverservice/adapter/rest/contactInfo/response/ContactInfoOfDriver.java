@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContactInformationResponse {
+public class ContactInfoOfDriver {
     private Long id;
     private Long driverId;
     private String type;
     private String address;
 
-    public static ContactInformationResponse from(ContactInfo contact) {
-        return ContactInformationResponse.builder()
+    public static ContactInfoOfDriver from(ContactInfo contact) {
+        return ContactInfoOfDriver.builder()
                 .id(contact.getId())
                 .driverId(contact.getDriverId())
                 .type(contact.getType())

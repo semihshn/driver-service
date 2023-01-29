@@ -20,7 +20,7 @@ public class DriverQueryController {
     private final DriverService driverService;
 
     @GetMapping("{driverId}")
-    public ResponseEntity<DriverResponse> retrieve(@PathVariable Long driverId) throws IOException {
+    public ResponseEntity<DriverResponse> retrieve(@PathVariable Long driverId) {
         return new ResponseEntity<>(DriverResponse.from(driverService.retrieve(driverId)), HttpStatus.OK);
     }
 

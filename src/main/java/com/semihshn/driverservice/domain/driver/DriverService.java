@@ -2,7 +2,6 @@ package com.semihshn.driverservice.domain.driver;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.semihshn.driverservice.domain.api.Notification;
 import com.semihshn.driverservice.domain.api.Payment;
 import com.semihshn.driverservice.domain.port.*;
 import com.semihshn.driverservice.domain.util.exception.ExceptionType;
@@ -25,7 +24,6 @@ import java.util.Optional;
 public class DriverService {
 
     private final DriverPersistencePort driverPort;
-    private final NotificationRestPort notificationPort;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper mapper;
     private final ElasticSearchPort elasticSearchPort;
@@ -49,17 +47,6 @@ public class DriverService {
         } catch (JsonProcessingException e) {
             throw new SemKafkaException(ExceptionType.KAFKA_ERROR, e.getMessage());
         }
-
-        notificationPort.saveNotification(
-                Notification.builder()
-                        .driverId(1L)
-                        .firstName("Schumeer")
-                        .lastName("Fernandes")
-                        .birthDate(LocalDate.now())
-                        .telephoneAddress("542 234 23 53")
-                        .message("Sürücü bilgileri kaydedildi, teşekkür ederiz")
-                        .build()
-        );
 
         Driver entity = driverPort.create(driver);
 
