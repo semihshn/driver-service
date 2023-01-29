@@ -1,6 +1,7 @@
 package com.semihshn.driverservice.adapter.rest.contactInfo.query;
 
-import com.semihshn.driverservice.adapter.rest.contactInfo.response.ContactInformationResponse;
+import com.semihshn.driverservice.adapter.rest.contactInfo.response.ContactInfoOfDriver;
+import com.semihshn.driverservice.adapter.rest.contactInfo.response.ContactInfoOfUser;
 import com.semihshn.driverservice.domain.contactInfo.ContactInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,23 +22,31 @@ public class ContactInfoQueryController {
     private final ContactInfoService contactInformationService;
 
     @GetMapping("{contactId}")
-    public ResponseEntity<ContactInformationResponse> retrieve(@PathVariable Long contactId) throws IOException {
-        return new ResponseEntity<>(ContactInformationResponse.from(contactInformationService.retrieve(contactId)), HttpStatus.OK);
+    public ResponseEntity<ContactInfoOfDriver> retrieve(@PathVariable Long contactId) throws IOException {
+        return new ResponseEntity<>(ContactInfoOfDriver.from(contactInformationService.retrieve(contactId)), HttpStatus.OK);
     }
 
     @GetMapping()
-    public ResponseEntity<List<ContactInformationResponse>> retrieveAll() throws IOException {
+    public ResponseEntity<List<ContactInfoOfDriver>> retrieveAll() throws IOException {
         return new ResponseEntity<>(contactInformationService.retrieveAll()
                 .stream()
-                .map(contactInfo -> ContactInformationResponse.from(contactInfo))
-                .collect(Collectors.toList()), HttpStatus.OK);
+                .map(ContactInfoOfDriver::from)
+                .toList(), HttpStatus.OK);
     }
 
     @GetMapping("drivers/{driverId}")
-    public ResponseEntity<List<ContactInformationResponse>> retrieveByDriverId(@PathVariable Long driverId) throws IOException {
+    public ResponseEntity<List<ContactInfoOfDriver>> retrieveByDriverId(@PathVariable Long driverId) throws IOException {
         return new ResponseEntity<>(contactInformationService.retrieveByDriverId(driverId)
                 .stream()
-                .map(ContactInformationResponse::from)
+                .map(ContactInfoOfDriver::from)
+                .toList(), HttpStatus.OK);
+    }
+
+    @GetMapping("users/{userId}")
+    public ResponseEntity<List<ContactInfoOfUser>> retrieveByUserId(@PathVariable Long userId) {
+        return new ResponseEntity<>(contactInformationService.retrieveByUserId(userId)
+                .stream()
+                .map(contactInfo -> ContactInfoOfUser.from(contactInfo, userId))
                 .toList(), HttpStatus.OK);
     }
 }
